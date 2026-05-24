@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class AvisStoreRequest extends FormRequest
 {
@@ -28,8 +31,6 @@ class AvisStoreRequest extends FormRequest
             'user_id' => ['required', 'integer', 'exists:users,id'],
             'artisan_id' => ['required', 'integer', 'exists:users,id'],
             'contenu' => ['required', 'string', 'min:10', 'max:2000'],
-            'isLitige' => ['required', 'boolean'],
-            'isVisible' => ['required', 'boolean'],
         ];
     }
 
@@ -46,10 +47,16 @@ class AvisStoreRequest extends FormRequest
             'contenu.string' => 'Le contenu doit être du texte.',
             'contenu.min' => 'Le contenu doit comporter au moins :min caractères.',
             'contenu.max' => 'Le contenu ne doit pas dépasser :max caractères.',
-            'isLitige.required' => 'Le statut litige est requis.',
-            'isLitige.boolean' => 'Le statut litige doit être vrai ou faux.',
-            'isVisible.required' => 'Le statut visibilité est requis.',
-            'isVisible.boolean' => 'Le statut visibilité doit être vrai ou faux.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $response = new JsonResponse([
+            'message' => 'Échec de la validation des données.',
+            'errors' => $validator->errors(),
+        ], 422);
+
+        throw new HttpResponseException($response);
     }
 }

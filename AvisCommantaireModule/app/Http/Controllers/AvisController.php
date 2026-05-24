@@ -14,27 +14,29 @@ class AvisController extends Controller
      */
     public function index($artisan_id)
     {
-        $avis = Avis::with('commentaires')
-            ->where('artisan_id', $artisan_id)
-            ->where('isVisible', true)
-            ->orderByDesc('created_at')
-            ->get();
-
-        return response()->json([
-            'data' => $avis,
-        ]);
+        try {
+            $avis = Avis::with('commentaires')->where('artisan_id', $artisan_id)->orderByDesc('created_at')->get();
+            return response()->json(['data' => $avis,]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th], 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AvisStoreRequest $request, $artisan_id)
+    public function store(AvisStoreRequest $request, int $user, int $artisan)
     {
-        $avis = Avis::create($request->validated());
-        return response()->json([
-            'message' => 'Avis créé avec succès.',
-            'data' => $avis->load('commentaires'),
-        ], 201);
+        try {
+            $avis = Avis::create($request->validated());
+            return response()->json([
+                'message' => 'Avis créé avec succès.',
+                'data' => $avis,
+            ], 201);
+            return response()->json(['message' => 'Action non authorisee.',$user], 201);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th,], 500);
+        }
     }
 
     /**
@@ -53,8 +55,11 @@ class AvisController extends Controller
      */
     public function destroy(User $user, Avis $avis)
     {
-        $avis->delete();
-        return response()->json(['message' => 'Avis supprimé avec succès']);
+        if (($user->user_id === $avis->user_id) && $avis->commentaires->count() < 1) {
+            $avis->delete();
+            return response()->json(['message' => 'Avis supprimé avec succès']);
+        }
+        return response()->json(['message' => 'Action non Authoriseé']);
     }
 
     /**
@@ -70,5 +75,15 @@ class AvisController extends Controller
             'message' => 'Visibilité de l\'avis mise à jour.',
             'data' => $avis,
         ]);
+    }
+
+    function AdminIndex()
+    {
+        try {
+            $avis = Avis::with('commentaires')->orderByDesc('created_at')->paginate(10);
+            return response()->json(['data' => $avis], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th], 500);
+        }
     }
 }

@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         User::factory(10)->create();
 
 
-        Avis::factory()->count(5)->has(Commentaire::factory()->count(10))->has(Avis_Litige::factory()->count(5))->create();
-        Avis::factory()->count(5)->has(Commentaire::factory()->count(10)->has(Commentaire_Litige::factory()->count(5)))->has(Avis_Litige::factory()->count(5))->create();
+        Avis::factory()->count(5)->has(Commentaire::factory()->count(10))->count(5)->create();
+        Avis::factory()->count(5)->has(Commentaire::factory())->count(5)->create();
     }
 }

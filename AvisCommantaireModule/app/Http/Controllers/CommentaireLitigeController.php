@@ -55,12 +55,18 @@ class CommentaireLitigeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Commentaire_Litige $commentaire_Litige)
+    public function destroy($artisan, Commentaire_Litige $commentaire_Litige)
     {
-        $commentaire_Litige->delete();
+        if ($artisan === $commentaire_Litige->artisan_id) {
 
-        return response()->json([
-            'message' => 'Litige commentaire supprimé avec succès.',
-        ]);
+            $commentaire_Litige->delete();
+
+            return response()->json([
+                'message' => 'Litige commentaire supprimé avec succès.',
+            ]);
+        }
+           return response()->json([
+                'message' => 'Action non authorisée.',
+            ]);
     }
 }

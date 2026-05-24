@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+
 #[Fillable(['artisan_id', 'avis_id', 'contenu', 'isResolu'])]
 class Avis_Litige extends Model
 {

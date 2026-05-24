@@ -16,8 +16,8 @@ return new class extends Migration
             $table->id();
             $table->integer('user_id');
             $table->foreignIdFor(Avis::class)->constrained()->cascadeOnDelete();
-            $table->boolean('isLitige');
-            $table->boolean('isVisible');
+            $table->boolean('isLitige')->default(false);
+            $table->boolean('isVisible')->default(true);
             $table->text('contenu');
             $table->timestamps();
         });

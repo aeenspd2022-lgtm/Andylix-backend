@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['avis_id', 'isLitige', 'isVisible', 'contenu'])]
+#[Fillable(['user_id','avis_id', 'isLitige', 'isVisible', 'contenu'])]
 class Commentaire extends Model
 {
     /** @use HasFactory<\Database\Factories\CommentaireFactory> */

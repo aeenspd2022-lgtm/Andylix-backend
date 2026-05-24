@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentaireStoreRequest;
 use App\Http\Requests\CommentaireUpdateRequest;
+use App\Models\Avis;
 use App\Models\Commentaire;
+use App\Models\User;
+use Faker\Provider\Lorem;
 
 class CommentaireController extends Controller
 {
@@ -13,27 +16,32 @@ class CommentaireController extends Controller
      */
     public function index()
     {
-        $commentaires = Commentaire::with('avis')
-            ->where('isVisible', true)
-            ->orderByDesc('created_at')
-            ->get();
-
-        return response()->json([
-            'data' => $commentaires,
-        ]);
+        try {
+            $commentaires = Commentaire::with('avis')->orderByDesc('created_at')->paginate(10);
+            return response()->json([
+                'data' => $commentaires,
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th,], 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CommentaireStoreRequest $request)
+    public function store(CommentaireStoreRequest $request,int $user, Avis $avis)
     {
-        $commentaire = Commentaire::create($request->validated());
 
+        if ($user === $avis->artisan_id) {
+            $commentaire = Commentaire::create($request->validated());
+            return response()->json([
+                'message' => 'Commentaire créé avec succès.', $user
+                'data' => $commentaire->load('avis'),
+            ], 201);
+        }
         return response()->json([
-            'message' => 'Commentaire créé avec succès.',
-            'data' => $commentaire->load('avis'),
-        ], 201);
+            'message' => 'Action non authorisée.',
+        ], 403);
     }
 
     /**
@@ -62,12 +70,16 @@ class CommentaireController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Commentaire $commentaire)
+    public function destroy(User $user, Commentaire $commentaire)
     {
-        $commentaire->delete();
-
+        if ($user->user_id === $commentaire->user_id) {
+            $commentaire->delete();
+            return response()->json([
+                'message' => 'Commentaire supprimé avec succès.',
+            ]);
+        }
         return response()->json([
-            'message' => 'Commentaire supprimé avec succès.',
+            'message' => 'Action non authorisée',
         ]);
     }
 

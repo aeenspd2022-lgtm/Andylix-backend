@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class CommentaireStoreRequest extends FormRequest
 {
@@ -51,5 +54,15 @@ class CommentaireStoreRequest extends FormRequest
             'isVisible.required' => 'Le statut visibilité est requis.',
             'isVisible.boolean' => 'Le statut visibilité doit être vrai ou faux.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $response = new JsonResponse([
+            'message' => 'Échec de la validation des données.',
+            'errors' => $validator->errors(),
+        ], 422);
+
+        throw new HttpResponseException($response);
     }
 }

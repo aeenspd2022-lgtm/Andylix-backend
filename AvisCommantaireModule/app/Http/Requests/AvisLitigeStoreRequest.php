@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class AvisLitigeStoreRequest extends FormRequest
 {
@@ -17,8 +20,8 @@ class AvisLitigeStoreRequest extends FormRequest
         $avis = $this->route('avis');
 
         $this->merge([
-            'artisan_id' => is_object($artisan) ? $artisan->id : $artisan,
-            'avis_id' => is_object($avis) ? $avis->id : $avis,
+            'artisan_id' => is_object($artisan) ? $artisan->id : (int)($artisan),
+            'avis_id' => is_object($avis) ? $avis->id : (int)($avis),
         ]);
     }
 
@@ -28,7 +31,6 @@ class AvisLitigeStoreRequest extends FormRequest
             'artisan_id' => ['required', 'integer', 'exists:users,id'],
             'avis_id' => ['required', 'integer', 'exists:avis,id'],
             'contenu' => ['required', 'string', 'min:10', 'max:2000'],
-            'isResolu' => ['required', 'boolean'],
         ];
     }
 
@@ -48,5 +50,15 @@ class AvisLitigeStoreRequest extends FormRequest
             'isResolu.required' => 'Le statut de résolution est requis.',
             'isResolu.boolean' => 'Le statut de résolution doit être vrai ou faux.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $response = new JsonResponse([
+            'message' => 'Échec de la validation des données.',
+            'errors' => $validator->errors(),
+        ], 422);
+
+        throw new HttpResponseException($response);
     }
 }

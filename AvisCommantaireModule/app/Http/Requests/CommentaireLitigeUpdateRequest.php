@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class CommentaireLitigeUpdateRequest extends FormRequest
 {
@@ -48,5 +51,15 @@ class CommentaireLitigeUpdateRequest extends FormRequest
             'isResolu.required' => 'Le statut de résolution est requis.',
             'isResolu.boolean' => 'Le statut de résolution doit être vrai ou faux.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $response = new JsonResponse([
+            'message' => 'Échec de la validation des données.',
+            'errors' => $validator->errors(),
+        ], 422);
+
+        throw new HttpResponseException($response);
     }
 }

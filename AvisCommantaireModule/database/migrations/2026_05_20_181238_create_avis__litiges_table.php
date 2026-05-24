@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('artisan_id');
             $table->foreignIdFor(Avis::class)->constrained()->cascadeOnDelete();
             $table->text('contenu');
-            $table->boolean('isResolu');
+            $table->boolean('isResolu')->default(false);
             $table->timestamps();
         });
     }

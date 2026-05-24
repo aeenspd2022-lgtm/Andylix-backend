@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AvisLitigeStoreRequest;
 use App\Http\Requests\AvisLitigeUpdateRequest;
+use App\Models\Avis;
 use App\Models\Avis_Litige;
 
 class AvisLitigeController extends Controller
@@ -19,14 +20,17 @@ class AvisLitigeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AvisLitigeStoreRequest $request)
+    public function store(AvisLitigeStoreRequest $request,$artisan_id, Avis $avis)
     {
-        $litige = Avis_Litige::create($request->validated());
+        if ($artisan_id === $avis->artisan_id) {
+            $litige = Avis_Litige::create($request->validated());
 
-        return response()->json([
-            'message' => 'Litige avis créé avec succès.',
-            'data' => $litige->load('avis'),
-        ], 201);
+            return response()->json([
+                'message' => 'Litige avis créé avec succès.',
+                'data' => $litige->load('avis'),
+            ], 201);
+        }
+          return response()->json([ 'message' => 'Action non authorisée.'  ], 201);
     }
 
     /**
@@ -55,12 +59,18 @@ class AvisLitigeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Avis_Litige $avis_Litige)
+    public function destroy($artisan, Avis_Litige $avis_Litige)
     {
-        $avis_Litige->delete();
+        if ($artisan === $avis_Litige->artisan_id) {
 
+            $avis_Litige->delete();
+
+            return response()->json([
+                'message' => 'Litige avis supprimé avec succès.',
+            ]);
+        }
         return response()->json([
-            'message' => 'Litige avis supprimé avec succès.',
+            'message' => 'Action non authorisée.',
         ]);
     }
 }

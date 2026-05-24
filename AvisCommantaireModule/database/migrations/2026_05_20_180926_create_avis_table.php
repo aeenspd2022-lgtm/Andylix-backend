@@ -16,8 +16,8 @@ return new class extends Migration
             $table->integer('user_id');
             $table->integer('artisan_id');
             $table->text('contenu');
-            $table->boolean('isLitige');
-            $table->boolean('isVisible');
+            $table->boolean('isLitige')->default(false);
+            $table->boolean('isVisible')->default(true);
             $table->timestamps();
         });
     }
