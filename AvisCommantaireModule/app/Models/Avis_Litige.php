@@ -15,7 +15,7 @@ class Avis_Litige extends Model
     use HasFactory;
 
     function avis() : HasOne {
-        return $this->hasOne(Avis::class);
+        return $this->hasOne(Avis::class, 'id', 'avis_id');
     }
 
 

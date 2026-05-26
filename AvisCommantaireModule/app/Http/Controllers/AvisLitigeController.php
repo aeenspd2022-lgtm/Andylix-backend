@@ -20,17 +20,21 @@ class AvisLitigeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AvisLitigeStoreRequest $request,$artisan_id, Avis $avis)
+    public function store(AvisLitigeStoreRequest $request, int $artisan, Avis $avis)
     {
-        if ($artisan_id === $avis->artisan_id) {
-            $litige = Avis_Litige::create($request->validated());
+        try {
+            if ($artisan === $avis->artisan_id) {
+                $litige = Avis_Litige::create($request->validated());
 
-            return response()->json([
-                'message' => 'Litige avis créé avec succès.',
-                'data' => $litige->load('avis'),
-            ], 201);
+                return response()->json([
+                    'message' => 'Litige avis créé avec succès.',
+                    'data' => $litige->load('avis'),
+                ], 201);
+            }
+            return response()->json(['message' => 'Action non authorisée.'], 201);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Une erreur est survenue.' . $th->getMessage()], 500);
         }
-          return response()->json([ 'message' => 'Action non authorisée.'  ], 201);
     }
 
     /**
@@ -39,32 +43,36 @@ class AvisLitigeController extends Controller
     public function show(Avis_Litige $avis_Litige)
     {
         return response()->json([
-            'data' => $avis_Litige->load('avis'),
+            'data' => $avis_Litige,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(AvisLitigeUpdateRequest $request, Avis_Litige $avis_Litige)
+    public function update(AvisLitigeUpdateRequest $request, int $artisan, Avis_Litige $avis_Litige)
     {
-        $avis_Litige->update($request->validated());
+        try {
+            if ($artisan === $avis_Litige->artisan_id) {
+                $avis_Litige->update($request->validated());
+            }
 
-        return response()->json([
-            'message' => 'Litige avis mis à jour avec succès.',
-            'data' => $avis_Litige->load('avis'),
-        ]);
+            return response()->json([
+                'message' => 'Litige avis mis à jour avec succès.',
+                'data' => $avis_Litige->load('avis'),
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Une erreur est survenue.' . $th->getMessage()], 500);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($artisan, Avis_Litige $avis_Litige)
+    public function destroy(int $artisan, Avis_Litige $avis_Litige)
     {
         if ($artisan === $avis_Litige->artisan_id) {
-
             $avis_Litige->delete();
-
             return response()->json([
                 'message' => 'Litige avis supprimé avec succès.',
             ]);

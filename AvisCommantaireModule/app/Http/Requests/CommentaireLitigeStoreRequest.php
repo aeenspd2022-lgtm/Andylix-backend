@@ -31,7 +31,6 @@ class CommentaireLitigeStoreRequest extends FormRequest
             'artisan_id' => ['required', 'integer', 'exists:users,id'],
             'commentaire_id' => ['required', 'integer', 'exists:commentaires,id'],
             'contenu' => ['required', 'string', 'min:10', 'max:2000'],
-            'isResolu' => ['required', 'boolean'],
         ];
     }
 
@@ -48,8 +47,6 @@ class CommentaireLitigeStoreRequest extends FormRequest
             'contenu.string' => 'Le contenu doit être du texte.',
             'contenu.min' => 'Le contenu doit comporter au moins :min caractères.',
             'contenu.max' => 'Le contenu ne doit pas dépasser :max caractères.',
-            'isResolu.required' => 'Le statut de résolution est requis.',
-            'isResolu.boolean' => 'Le statut de résolution doit être vrai ou faux.',
         ];
     }
 
