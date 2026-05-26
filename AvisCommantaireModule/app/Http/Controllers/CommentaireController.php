@@ -29,18 +29,18 @@ class CommentaireController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CommentaireStoreRequest $request,int $user, Avis $avis)
+    public function store(CommentaireStoreRequest $request, int $user, Avis $avis)
     {
-
-        if ($user === $avis->artisan_id) {
+        if ($user !== $avis->user_id) {
             $commentaire = Commentaire::create($request->validated());
             return response()->json([
-                'message' => 'Commentaire créé avec succès.', $user
-                'data' => $commentaire->load('avis'),
+                'message' => 'Commentaire créé avec succès.',
+                'data' => $commentaire->load('avis')
             ], 201);
         }
+
         return response()->json([
-            'message' => 'Action non authorisée.',
+            'message' => 'Action non authorisée. Un utilisateur ne peut pas commenter son propre avis.',
         ], 403);
     }
 
@@ -57,29 +57,34 @@ class CommentaireController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CommentaireUpdateRequest $request, Commentaire $commentaire)
+    public function update(CommentaireUpdateRequest $request, int $user,Commentaire $commentaire)
     {
-        $commentaire->update($request->validated());
+        if ($user === $commentaire->user_id) {
+            $commentaire->update($request->validated());
+            return response()->json([
+                'message' => 'Commentaire mis à jour avec succès.',
+                'data' => $commentaire->load('avis'),
+            ]);
+        }
 
         return response()->json([
-            'message' => 'Commentaire mis à jour avec succès.',
-            'data' => $commentaire->load('avis'),
-        ]);
+            'message' => 'Action non authorisée. Un utilisateur ne peut pas modifier un commentaire qu\'il n\'a pas créé.',
+        ], 403);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user, Commentaire $commentaire)
+    public function destroy(int $user, Commentaire $commentaire)
     {
-        if ($user->user_id === $commentaire->user_id) {
+        if ($user === $commentaire->user_id) {
             $commentaire->delete();
             return response()->json([
                 'message' => 'Commentaire supprimé avec succès.',
             ]);
         }
         return response()->json([
-            'message' => 'Action non authorisée',
+            'message' => 'Action non authorisée. Un utilisateur ne peut pas supprimer un commentaire qu\'il n\'a pas créé.',
         ]);
     }
 

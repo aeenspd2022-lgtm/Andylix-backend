@@ -29,10 +29,7 @@ class CommentaireUpdateRequest extends FormRequest
     {
         return [
             'user_id' => ['required', 'integer', 'exists:users,id'],
-            'avis_id' => ['required', 'integer', 'exists:avis,id'],
             'contenu' => ['required', 'string', 'min:5', 'max:2000'],
-            'isLitige' => ['required', 'boolean'],
-            'isVisible' => ['required', 'boolean'],
         ];
     }
 
@@ -42,17 +39,10 @@ class CommentaireUpdateRequest extends FormRequest
             'user_id.required' => 'L’identifiant de l’utilisateur est requis.',
             'user_id.integer' => 'L’identifiant de l’utilisateur doit être un nombre entier.',
             'user_id.exists' => 'L’utilisateur sélectionné est invalide.',
-            'avis_id.required' => 'L’identifiant de l’avis est requis.',
-            'avis_id.integer' => 'L’identifiant de l’avis doit être un nombre entier.',
-            'avis_id.exists' => 'L’avis sélectionné est invalide.',
             'contenu.required' => 'Le contenu est requis.',
             'contenu.string' => 'Le contenu doit être du texte.',
             'contenu.min' => 'Le contenu doit comporter au moins :min caractères.',
             'contenu.max' => 'Le contenu ne doit pas dépasser :max caractères.',
-            'isLitige.required' => 'Le statut litige est requis.',
-            'isLitige.boolean' => 'Le statut litige doit être vrai ou faux.',
-            'isVisible.required' => 'Le statut visibilité est requis.',
-            'isVisible.boolean' => 'Le statut visibilité doit être vrai ou faux.',
         ];
     }
 

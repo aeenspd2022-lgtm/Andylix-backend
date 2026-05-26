@@ -12,7 +12,7 @@ class AvisController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($artisan_id)
+    public function index(int $artisan_id)
     {
         try {
             $avis = Avis::with('commentaires')->where('artisan_id', $artisan_id)->orderByDesc('created_at')->get();
@@ -33,7 +33,7 @@ class AvisController extends Controller
                 'message' => 'Avis créé avec succès.',
                 'data' => $avis,
             ], 201);
-            return response()->json(['message' => 'Action non authorisee.',$user], 201);
+            return response()->json(['message' => 'Action non authorisee.', $user], 201);
         } catch (\Throwable $th) {
             return response()->json(['message' => $th,], 500);
         }
@@ -42,24 +42,36 @@ class AvisController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AvisUpdateRequest $request, $artisan_id, Avis $avis)
+    public function update(AvisUpdateRequest $request, int $user, Avis $avis)
     {
-        $avis->update($request->validated());
-        return response()->json([
-            'data' => $avis->load('commentaires')
-        ]);
+        try {
+            if ($user === $avis->user_id) {
+                $avis->update($request->validated());
+                return response()->json([
+                    'message' => 'Avis mis à jour avec succès.',
+                    'data' => $avis->load('commentaires')
+                ]);
+            }
+            return response()->json(['message' => 'Action non authorisee.'], 403);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th,], 500);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user, Avis $avis)
+    public function destroy(int $user, Avis $avis)
     {
-        if (($user->user_id === $avis->user_id) && $avis->commentaires->count() < 1) {
-            $avis->delete();
-            return response()->json(['message' => 'Avis supprimé avec succès']);
+        try {
+            if ($user === $avis->user_id) {
+                $avis->delete();
+                return response()->json(['message' => 'Avis supprimé avec succès.']);
+            }
+            return response()->json(['message' => 'Action non authorisee.'], 403);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th,], 500);
         }
-        return response()->json(['message' => 'Action non Authoriseé']);
     }
 
     /**

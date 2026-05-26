@@ -31,8 +31,6 @@ class CommentaireStoreRequest extends FormRequest
             'user_id' => ['required', 'integer', 'exists:users,id'],
             'avis_id' => ['required', 'integer', 'exists:avis,id'],
             'contenu' => ['required', 'string', 'min:5', 'max:2000'],
-            'isLitige' => ['required', 'boolean'],
-            'isVisible' => ['required', 'boolean'],
         ];
     }
 
@@ -49,10 +47,6 @@ class CommentaireStoreRequest extends FormRequest
             'contenu.string' => 'Le contenu doit être du texte.',
             'contenu.min' => 'Le contenu doit comporter au moins :min caractères.',
             'contenu.max' => 'Le contenu ne doit pas dépasser :max caractères.',
-            'isLitige.required' => 'Le statut litige est requis.',
-            'isLitige.boolean' => 'Le statut litige doit être vrai ou faux.',
-            'isVisible.required' => 'Le statut visibilité est requis.',
-            'isVisible.boolean' => 'Le statut visibilité doit être vrai ou faux.',
         ];
     }
 
